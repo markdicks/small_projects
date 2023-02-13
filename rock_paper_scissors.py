@@ -40,25 +40,25 @@ def get_user_input():
 def decide_winner(cpu_choice, human_choice):
     cpu_num = get_reversed_dictionary(cpu_choice)
     human_answer = get_reversed_dictionary(human_choice)
-    match cpu_choice:
+    match cpu_num:
         case 1:
-            if human_choice == 2:
+            if human_answer == 2:
                 return "You lost, unlucky fam"
-            elif human_choice == 1:
+            elif human_answer == 1:
                 return "It's a tie, gg"
             else:
                 return "You lucky boy, you won, gg"
         case 2:
-            if human_choice == 3:
+            if human_answer == 3:
                 return "You lost, unlucky fam"
-            if human_choice == 2:
+            if human_answer == 2:
                 return "It's a tie, gg"
             else:
                 return "You lucky boy, you won, gg"
         case 3:
-            if human_choice == 1:
+            if human_answer == 1:
                 return "You lost, unlucky fam"
-            if human_choice == 3:
+            if human_answer == 3:
                 return "It's a tie, gg"
             else:
                 return "You lucky boy, you won, gg"
@@ -79,6 +79,7 @@ def main():
     usr_input = get_dictionary(get_user_input())
     cpu_choice = get_dictionary(get_cpu_choice())
     get_winner = decide_winner(cpu_choice, usr_input)
+    print(get_winner)
 
 
 if __name__ == "__main__":
