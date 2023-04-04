@@ -1,30 +1,44 @@
-import time
 import os
 import random
+import time
 
+# Specify the directory containing your wallpaper images
+wallpaper_dir = '/path/to/wallpapers'
 
+# Define a function to change the wallpaper
 def change_wallpaper():
-    # Replace the file path with the path to the folder containing
-    #  your wallpapers
-    path = "/home/wethinkcode/Pictures/Wallpapers"
-    wallpapers = os.listdir(path)
-    # Replace the file extension with the extension of your wallpaper files
-    wallpapers = [wallpaper for wallpaper in wallpapers if wallpaper.endswith(".jpg")]
-    # Shuffle the list of wallpapers
-    random.shuffle(wallpapers)
-    # Set the index of the wallpaper you want to use first
-    index = 0
-    while True:
-        # Set the file path to the next wallpaper in the list
-        wallpaper_path = os.path.join(path, wallpapers[index])
-        # Set the command to change the wallpaper
-        command = "gsettings set org.gnome.desktop.background picture-uri file://" + wallpaper_path
-        os.system(command)
-        # Wait for 5 minutes
-        time.sleep(300)
-        # Increment the index to use the next wallpaper in the list, 
-        # looping back to the beginning if necessary
-        index = (index + 1) % len(wallpapers)
+    # Get a list of all the files in the wallpaper directory
+    wallpaper_list = [os.path.join(wallpaper_dir, f) for f in os.listdir(wallpaper_dir) if os.path.isfile(os.path.join(wallpaper_dir, f))]
 
-if __name__ == "__main__":
+    # Filter out any non-image files
+    image_extensions = ['.jpg', '.jpeg', '.png', '.bmp', '.gif']
+    wallpaper_list = [f for f in wallpaper_list if os.path.splitext(f)[1].lower() in image_extensions]
+
+    # Choose a random wallpaper from the list
+    wallpaper = random.choice(wallpaper_list)
+
+    # Set the wallpaper using the appropriate command for your desktop environment
+    os_name = os.name
+    if os_name == 'posix':
+        # For Linux
+        desktop_environment = os.environ.get('DESKTOP_SESSION')
+        if desktop_environment == 'gnome':
+            os.system('gsettings set org.gnome.desktop.background picture-uri "file://%s"' % wallpaper)
+        elif desktop_environment == 'mate':
+            os.system('mateconftool-2 -t string -s /desktop/mate/background/picture_filename "%s"' % wallpaper)
+        elif desktop_environment == 'xfce':
+            os.system('xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/workspace0/last-image -s "%s"' % wallpaper)
+        else:
+            print('Unsupported desktop environment')
+    elif os_name == 'nt':
+        # For Windows
+        import ctypes
+        SPI_SETDESKWALLPAPER = 20
+        ctypes.windll.user32.SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, wallpaper, 0)
+    else:
+        print('Unsupported operating system')
+
+# Set the wallpaper every 5 minutes
+while True:
     change_wallpaper()
+    time.sleep(300)
